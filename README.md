@@ -1,3 +1,5 @@
+# This Script is not fully functional yet
+
 # gfx-fuelsteal
 !!! This script works with esx only, tesed on ESX Extended V1 Fianl.
 
