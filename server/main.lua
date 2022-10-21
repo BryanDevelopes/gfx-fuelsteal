@@ -1,18 +1,20 @@
-QBCore = exports['qb-core']:GetCoreObject()
+ESX = nil
 
-QBCore.Functions.CreateUseableItem("fuel_can", function(source, item)
-    local value = item.info.value
-    TriggerClientEvent("gfx-stealfuel:InteractWithCar", source, ((value == nil or value == 0) and "steal" or "fill"), value, item.slot)
+
+TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+
+
+ESX.RegisterUsableItem("fuel_can", function(source, item)
+    TriggerClientEvent("gfx-stealfuel:InteractWithCar", source, ((value == nil or value == 0) and "steal" or "fill"), value)
 end)
 
 RegisterServerEvent("gfx-stealfuel:InteractWithCar")
 AddEventHandler("gfx-stealfuel:InteractWithCar", function(value, slot)
-    local player = QBCore.Functions.GetPlayer(source)
-    if player then
-        local item = player.PlayerData.items[slot]
-        if item.name == "fuel_can" then
-            player.PlayerData.items[slot].info.value = value
-            player.Functions.SetPlayerData("items", player.PlayerData.items)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer then
+        local item = xPlayer.getInventoryItem("fuel_can")
+        if item then
+            item.value = value
         end
     end
 end)
