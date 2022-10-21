@@ -5,6 +5,7 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
 
 ESX.RegisterUsableItem("fuel_can", function(source, item)
+    local value = item.value
     TriggerClientEvent("gfx-stealfuel:InteractWithCar", source, ((value == nil or value == 0) and "steal" or "fill"), value)
 end)
 
