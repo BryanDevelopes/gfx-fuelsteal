@@ -1,24 +1,32 @@
-QBCore = exports['qb-core']:GetCoreObject()
+ESX = nil
 local isDoing = false
+local fuelvalue = 0
 
-RegisterNetEvent("gfx-stealfuel:InteractWithCar", function(fuelType, value, slot)
+Citizen.CreateThread(function()
+	while ESX == nil do
+		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+		Citizen.Wait(0)
+	end
+end)
+
+RegisterNetEvent("gfx-stealfuel:InteractWithCar", function(fuelType, value)
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped) then return end
     value = value and value or 0
     local coords = GetEntityCoords(ped)
-    local vehicle, distance = QBCore.Functions.GetClosestVehicle(coords)
+    local vehicle, distance = ESX.Game.GetClosestVehicle(coords)
     if vehicle and distance <= 2.5 then
-        FillOrSteal(vehicle, fuelType, value, slot)
+        FillOrSteal(vehicle, fuelType, value)
     end
 end)
 
-function FillOrSteal(vehicle, fuelType, value, slot)
+function FillOrSteal(vehicle, fuelType, value)
     if isDoing then return end
     local ped = PlayerPedId()
     isDoing = true
     Animation(ped)
     CancelThread()
-    local vehicleFuel = exports["LegacyFuel"]:GetFuel(vehicle)
+    local vehicleFuel = exports["sosa-base"]:GetFuel(vehicle)
     if vehicleFuel == 100 then
         fuelType = "steal"
     end
@@ -40,8 +48,8 @@ function FillOrSteal(vehicle, fuelType, value, slot)
                 break
             end
         end
-        exports["LegacyFuel"]:SetFuel(vehicle, newFuel)
-        TriggerServerEvent("gfx-stealfuel:InteractWithCar", (vehicleFuel - newFuel), slot)
+        exports["sosa-base"]:SetFuel(vehicle, newFuel)
+        TriggerServerEvent("gfx-stealfuel:InteractWithCar", (vehicleFuel - newFuel))
     else
         local limit = (value + vehicleFuel) >= 100 and 100 or (value + vehicleFuel)
         for i = vehicleFuel, limit do
@@ -56,8 +64,8 @@ function FillOrSteal(vehicle, fuelType, value, slot)
                 break
             end
         end
-        exports["LegacyFuel"]:SetFuel(vehicle, limit + 0.0)
-        TriggerServerEvent("gfx-stealfuel:InteractWithCar", math.abs(limit - value - vehicleFuel), slot)
+        exports["sosa-base"]:SetFuel(vehicle, limit + 0.0)
+        TriggerServerEvent("gfx-stealfuel:InteractWithCar", math.abs(limit - value - vehicleFuel))
     end
     SendNUIMessage({
         type = "display",
